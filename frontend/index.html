@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Dealership - Buy Your Dream Car</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* Navigation */
+        nav {
+            background: #1a1a1a;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            box-sizing: border-box;
+            flex-wrap: wrap;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .vehicle-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .vehicle-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+
+        .vehicle-card-body {
+            padding: 1rem;
+        }
+
+        .vehicle-card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .vehicle-card-info {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        /* Page */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* Link */
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Detail view */
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin: -2rem -2rem 4rem -2rem;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-buttons .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Feature Sections */
+        .feature-section {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .feature-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-section p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .login-banner {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .login-banner h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .login-banner p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-brand">🚗 Car Dealership</div>
+        <div class="nav-links" id="navLinks">
+            <a href="#" onclick="router.navigate('home'); return false;">Home</a>
+            <a href="#" onclick="router.navigate('vehicles'); return false;">Browse Vehicles</a>
+            <a href="#" onclick="router.navigate('dealers'); return false;">Dealers</a>
+            <a href="#" onclick="router.navigate('brands'); return false;">Brands</a>
+            <a href="#" onclick="router.navigate('models'); return false;">Models</a>
+            <div class="user-info" id="userInfo">
+                <span id="userName"></span>
+                <button class="btn btn-secondary" onclick="auth.logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Home/Landing Page -->
+        <div id="page-home" class="page active">
+            <div class="hero">
+                <h1>🚗 Find Your Dream Car</h1>
+                <p>Browse our extensive inventory of quality vehicles from trusted dealers</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="router.navigate('vehicles')">Browse Vehicles</button>
+                    <button class="btn btn-secondary" id="heroLoginButton" onclick="router.navigate('login')">Login / Sign Up</button>
+                </div>
+            </div>
+
+            <div class="login-banner" id="homeLoginBanner">
+                <h2>Already have an account?</h2>
+                <p>Login to access your account, view your purchases, and manage your profile</p>
+                <button class="btn btn-primary" onclick="router.navigate('login')">Login Now</button>
+            </div>
+
+            <div class="feature-section">
+                <h2>Explore Our Inventory</h2>
+                <p>Discover vehicles from top brands and trusted dealers</p>
+                <div class="feature-grid">
+                    <div class="feature-card" onclick="router.navigate('vehicles')">
+                        <div class="feature-icon">🚙</div>
+                        <h3>Browse Vehicles</h3>
+                        <p>Search through our extensive collection of available vehicles. Filter by brand, model, year, and more.</p>
+                    </div>
+                    <div class="feature-card" onclick="router.navigate('dealers')">
+                        <div class="feature-icon">🏢</div>
+                        <h3>Find Dealers</h3>
+                        <p>Browse our network of trusted dealers. Check their inventory and find the perfect location for you.</p>
+                    </div>
+                    <div class="feature-card" onclick="router.navigate('brands')">
+                        <div class="feature-icon">🏭</div>
+                        <h3>Explore Brands</h3>
+                        <p>Discover vehicles from your favorite brands. Learn about each brand and see available models.</p>
+                    </div>
+                    <div class="feature-card" onclick="router.navigate('models')">
+                        <div class="feature-icon">🚗</div>
+                        <h3>Check Models</h3>
+                        <p>Browse different vehicle models. See specifications, options, and available inventory for each model.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-section" style="background: #f8f9fa; padding: 4rem 2rem; border-radius: 12px; margin-top: 3rem;">
+                <h2>Why Choose Us?</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" style="cursor: default;">
+                        <div class="feature-icon">✅</div>
+                        <h3>Quality Vehicles</h3>
+                        <p>All our vehicles are thoroughly inspected and come with detailed information</p>
+                    </div>
+                    <div class="feature-card" style="cursor: default;">
+                        <div class="feature-icon">🔍</div>
+                        <h3>Easy Search</h3>
+                        <p>Powerful filtering and search tools to help you find exactly what you're looking for</p>
+                    </div>
+                    <div class="feature-card" style="cursor: default;">
+                        <div class="feature-icon">💳</div>
+                        <h3>Flexible Payments</h3>
+                        <p>Multiple payment options available to suit your needs</p>
+                    </div>
+                    <div class="feature-card" style="cursor: default;">
+                        <div class="feature-icon">🤝</div>
+                        <h3>Trusted Dealers</h3>
+                        <p>Work with reputable dealers in our network</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="page-login" class="page">
+            <div class="card" style="max-width: 400px; margin: 4rem auto;">
+                <div class="card-header">Login / Create Account</div>
+                <div id="loginError" class="alert alert-error hidden"></div>
+                <div class="form-group">
+                    <label>Are you an Employee?</label>
+                    <select id="userType" onchange="toggleLoginForm()">
+                        <option value="customer">Customer</option>
+                        <option value="employee">Employee</option>
+                    </select>
+                </div>
+                <div id="customerLogin">
+                    <div class="form-group">
+                        <label>Customer ID</label>
+                        <input type="number" id="customerId" placeholder="Enter your customer ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Or Create New Account</label>
+                        <button class="btn btn-secondary" onclick="router.navigate('register')">Create Account</button>
+                    </div>
+                </div>
+                <div id="employeeLogin" class="hidden">
+                    <div class="form-group">
+                        <label>Employee ID</label>
+                        <input type="number" id="employeeId" placeholder="Enter your employee ID">
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="auth.login()">Login</button>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="page-register" class="page">
+            <div class="card">
+                <div class="card-header">Create Customer Account</div>
+                <div id="registerError" class="alert alert-error hidden"></div>
+                <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Customer ID *</label>
+                            <input type="number" id="reg_customer_id" required>
+                        </div>
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="reg_first" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Middle Initial</label>
+                            <input type="text" id="reg_middle_i" maxlength="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="reg_last" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Street *</label>
+                            <input type="text" id="reg_street" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City *</label>
+                            <input type="text" id="reg_city" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State *</label>
+                            <input type="text" id="reg_state" maxlength="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Zip Code *</label>
+                            <input type="text" id="reg_zip_code" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth *</label>
+                            <input type="date" id="reg_date_of_birth" required>
+                        </div>
+                        <div class="form-group">
+                            <label>License Number *</label>
+                            <input type="text" id="reg_license_num" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="reg_phone_number">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="reg_gender">
+                                <option value="">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Income</label>
+                            <input type="number" id="reg_income">
+                        </div>
+                        <div class="form-group">
+                            <label>Marital Status</label>
+                            <select id="reg_marital_status">
+                                <option value="">Select</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Dependents</label>
+                            <input type="number" id="reg_dependents">
+                        </div>
+                        <div class="form-group">
+                            <label>Credit Score</label>
+                            <input type="number" id="reg_cred_score" min="300" max="850">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                    <button type="button" class="btn btn-secondary" onclick="router.navigate('login')">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Browse Vehicles Page -->
+        <div id="page-vehicles" class="page">
+            <h1>Browse Vehicles</h1>
+            <div class="filters">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select id="filterBrand">
+                            <option value="">All Brands</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="filterModel">
+                            <option value="">All Models</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Body Style</label>
+                        <select id="filterBodyStyle">
+                            <option value="">All Styles</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Year From</label>
+                        <input type="number" id="filterYearFrom" min="1900" max="2025">
+                    </div>
+                    <div class="form-group">
+                        <label>Year To</label>
+                        <input type="number" id="filterYearTo" min="1900" max="2025">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Mileage</label>
+                        <input type="number" id="filterMaxMileage">
+                    </div>
+                    <div class="form-group">
+                        <label>Dealer</label>
+                        <select id="filterDealer">
+                            <option value="">All Dealers</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sort By</label>
+                        <select id="sortBy">
+                            <option value="year">Year (Newest)</option>
+                            <option value="year_asc">Year (Oldest)</option>
+                            <option value="mileage">Mileage (Lowest)</option>
+                            <option value="mileage_desc">Mileage (Highest)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="loadVehicles()">Apply Filters</button>
+            </div>
+            <div id="vehiclesList" class="grid"></div>
+        </div>
+
+        <!-- Vehicle Detail Page -->
+        <div id="page-vehicle-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('vehicles')">← Back to Vehicles</button>
+                <div id="vehicleDetail"></div>
+            </div>
+        </div>
+
+        <!-- Dealers Page -->
+        <div id="page-dealers" class="page">
+            <h1>Dealers</h1>
+            <div id="dealersList" class="grid"></div>
+        </div>
+
+        <!-- Dealer Detail Page -->
+        <div id="page-dealer-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('dealers')">← Back to Dealers</button>
+                <div id="dealerDetail"></div>
+            </div>
+        </div>
+
+        <!-- Brands Page -->
+        <div id="page-brands" class="page">
+            <h1>Brands</h1>
+            <div id="brandsList" class="grid"></div>
+        </div>
+
+        <!-- Brand Detail Page -->
+        <div id="page-brand-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('brands')">← Back to Brands</button>
+                <div id="brandDetail"></div>
+            </div>
+        </div>
+
+        <!-- Models Page -->
+        <div id="page-models" class="page">
+            <h1>Models</h1>
+            <div id="modelsList" class="grid"></div>
+        </div>
+
+        <!-- Model Detail Page -->
+        <div id="page-model-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('models')">← Back to Models</button>
+                <div id="modelDetail"></div>
+            </div>
+        </div>
+
+        <!-- My Account Page -->
+        <div id="page-account" class="page">
+            <h1>My Account</h1>
+            <div id="accountInfo" class="card"></div>
+        </div>
+
+        <!-- My Purchases Page -->
+        <div id="page-purchases" class="page">
+            <h1>My Purchases</h1>
+            <div id="purchasesList" class="card"></div>
+        </div>
+
+        <!-- Sale Detail Page -->
+        <div id="page-sale-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('purchases')">← Back to Purchases</button>
+                <div id="saleDetail"></div>
+            </div>
+        </div>
+
+        <!-- Employee Dashboard -->
+        <div id="page-employee-dashboard" class="page">
+            <h1>Employee Dashboard</h1>
+            <div id="employeeStats" class="stats-grid"></div>
+            <div class="card">
+                <div class="card-header">Quick Actions</div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="router.navigate('employee-inventory')">View Inventory</button>
+                    <button class="btn btn-primary" onclick="router.navigate('employee-sales')">View Sales</button>
+                    <button class="btn btn-primary" onclick="router.navigate('employee-customers')">View Customers</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Inventory -->
+        <div id="page-employee-inventory" class="page">
+            <h1>My Dealer Inventory</h1>
+            <div id="employeeInventory" class="grid"></div>
+        </div>
+
+        <!-- Employee Vehicle Detail -->
+        <div id="page-employee-vehicle-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('employee-inventory')">← Back to Inventory</button>
+                <div id="employeeVehicleDetail"></div>
+            </div>
+        </div>
+
+        <!-- Employee Customers -->
+        <div id="page-employee-customers" class="page">
+            <h1>Customers</h1>
+            <div class="filters">
+                <div class="form-group">
+                    <label>Search Customer</label>
+                    <input type="text" id="customerSearch" placeholder="Search by name or ID" onkeyup="searchCustomers()">
+                </div>
+            </div>
+            <div id="employeeCustomersList" class="card"></div>
+        </div>
+
+        <!-- Employee Sales -->
+        <div id="page-employee-sales" class="page">
+            <h1>Sales (My Dealer)</h1>
+            <div id="employeeSalesList" class="card"></div>
+        </div>
+
+        <!-- Employee Sale Detail -->
+        <div id="page-employee-sale-detail" class="page">
+            <div class="card">
+                <button class="btn btn-secondary" onclick="router.navigate('employee-sales')">← Back to Sales</button>
+                <div id="employeeSaleDetail"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
