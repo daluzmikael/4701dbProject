@@ -49,26 +49,44 @@ Run the setup script:
 
 ## Running the Application
 
+### Quick Start (Both Backend and Frontend)
+
 1. **Activate the virtual environment** (if not already activated):
    ```bash
    source venv/bin/activate
    ```
 
-2. **Start the backend server**:
+2. **Start the backend server** (Terminal 1):
    ```bash
    cd backend
    python app.py
    ```
-   The backend will run on `http://localhost:5001`
+   The backend will run on `http://localhost:8000`
+   - Make sure Oracle Database is running and configured in `backend/app.py`
 
-3. **Open the frontend**:
-   - Open `frontend/index.html` in your web browser
-   - Or use a simple HTTP server:
-     ```bash
-     cd frontend
-     python -m http.server 8000
-     ```
-     Then navigate to `http://localhost:8000` in your browser
+3. **Start the frontend server** (Terminal 2 - new terminal window):
+   ```bash
+   cd frontend
+   python3 -m http.server 8001
+   ```
+   Or use the provided script:
+   ```bash
+   cd frontend
+   ./start_server.sh
+   ```
+
+4. **Open in browser**:
+   - Navigate to `http://localhost:8001` (or `http://localhost:8000` if using the script)
+   - The frontend is pre-configured to connect to the backend at `http://localhost:8000`
+
+### Running Frontend Only (Demo Mode)
+
+If you just want to see the frontend UI without the backend:
+```bash
+cd frontend
+python3 -m http.server 8001
+```
+Then open `http://localhost:8001` in your browser. The frontend will work in demo mode with mock data.
 
 ## Deactivating the Virtual Environment
 
@@ -110,13 +128,36 @@ See `BACKEND_API_REQUIREMENTS.md` for a complete list of API endpoints that need
 
 **Note:** The frontend currently uses mock data for some features. Once the backend endpoints are implemented, update the `API_BASE` constant in `frontend/app.js` to point to your backend URL.
 
+## Configuration
+
+### Backend Configuration
+- The backend runs on port **8000** by default
+- Database connection settings are in `backend/app.py` (lines 19-23)
+- Update the Oracle connection settings if needed:
+  ```python
+  DB_USER = "system"
+  DB_PASS = "your_password"
+  DB_HOST = "localhost"
+  DB_PORT = 1521
+  DB_SERVICE = "FREE"  # Change to match your Oracle service name
+  ```
+
+### Frontend Configuration
+- The frontend is configured to connect to `http://localhost:8000` by default
+- To change the backend URL, edit `frontend/app.js` (line 15):
+  ```javascript
+  const API_BASE = 'http://localhost:8000'; // Change if backend is on different machine/port
+  ```
+
 ## Notes
 
-- Make sure you have Oracle Database running and accessible with the credentials configured in `backend/app.py`
-- The frontend expects the backend to be running on `http://localhost:5000` (update `API_BASE` in `frontend/app.js` if different)
-- If you encounter database connection errors, ensure:
-  - Oracle Database is running
-  - The connection settings in `backend/app.py` are correct
-  - The database service name matches your Oracle installation
-- The frontend is a client-side SPA - no backend is needed to view the UI structure, but API calls will fail until backend endpoints are implemented
+- **Oracle Database Required**: The backend requires Oracle Database to be installed and running
+- **Ports**: 
+  - Backend: Port 8000
+  - Frontend: Port 8001 (or 8000 if using start_server.sh)
+- **Demo Mode**: The frontend can run without the backend using demo mode (see "Running Frontend Only" above)
+- **Database Connection**: If you encounter database connection errors:
+  - Ensure Oracle Database is running
+  - Verify connection settings in `backend/app.py`
+  - Check that the service name matches your Oracle installation
 

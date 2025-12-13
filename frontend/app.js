@@ -1,5 +1,14 @@
 // Configuration
-const API_BASE = 'http://localhost:5000'; // Update this to your partner's backend URL
+// ============================================
+// BACKEND URL CONFIGURATION
+// ============================================
+// Default: Connect to backend running locally on same machine
+// To connect to a remote backend, update this URL:
+//   'http://localhost:8000'                    - Local (default, backend on same machine)
+//   'http://192.168.1.100:8000'                - Remote backend on local network
+//   'http://your-domain.com:8000'              - Remote backend online
+// ============================================
+const API_BASE = 'http://localhost:8000'; // Backend URL - change if backend is on different machine
 
 // State Management
 const state = {
@@ -19,13 +28,27 @@ const api = {
                 },
                 ...options
             });
-            const data = await response.json();
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (e) {
+                // If response is not JSON, get text
+                const text = await response.text();
+                throw new Error(text || `HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             if (!response.ok) {
-                throw new Error(data.error || 'Request failed');
+                throw new Error(data.error || `HTTP ${response.status}: Request failed`);
             }
             return data;
         } catch (error) {
-            console.error('API Error:', error);
+            // Log error but don't throw if it's a network error (backend not available)
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('CORS')) {
+                console.log('Backend not available:', endpoint, '- Frontend will use demo mode');
+                throw new Error('BACKEND_NOT_AVAILABLE');
+            }
+            console.error('API Error:', endpoint, error);
             throw error;
         }
     },
@@ -550,28 +573,40 @@ function loadAccount() {
     const container = document.getElementById('accountInfo');
     const user = state.currentUser;
     
+    // Helper to get value from either uppercase or lowercase keys
+    const get = (upper, lower, defaultVal = 'N/A') => {
+        return user[upper] !== undefined ? user[upper] : (user[lower] !== undefined ? user[lower] : defaultVal);
+    };
+    
+    const firstName = get('FIRST', 'first', '');
+    const middleI = get('MIDDLE_I', 'middle_i', '') || '';
+    const lastName = get('LAST', 'last', '');
+    const fullName = `${firstName} ${middleI} ${lastName}`.trim();
+    const phones = user.PHONES || user.phones || [];
+    const phoneNumbers = phones.map(p => p.PHONE_NUMBER || p.phone_number || p).filter(Boolean);
+    
     container.innerHTML = `
         <div class="card-header">My Account</div>
         <div class="detail-section">
             <div class="detail-row">
                 <div class="detail-label">Name:</div>
-                <div>${user.FIRST || user.first} ${user.MIDDLE_I || user.middle_i || ''} ${user.LAST || user.last}</div>
+                <div>${fullName}</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">License Number:</div>
-                <div>${user.LICENSE_NUM || user.license_num}</div>
+                <div>${get('LICENSE_NUM', 'license_num')}</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Credit Score:</div>
-                <div>${user.CRED_SCORE || user.cred_score || 'N/A'}</div>
+                <div>${get('CRED_SCORE', 'cred_score')}</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Address:</div>
-                <div>${user.STREET || user.street}, ${user.CITY || user.city}, ${user.STATE || user.state} ${user.ZIP_CODE || user.zip_code}</div>
+                <div>${get('STREET', 'street')}, ${get('CITY', 'city')}, ${get('STATE', 'state')} ${get('ZIP_CODE', 'zip_code')}</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Phone Numbers:</div>
-                <div>${(user.PHONES || []).map(p => p.PHONE_NUMBER || p.phone_number).join(', ') || 'None'}</div>
+                <div>${phoneNumbers.length > 0 ? phoneNumbers.join(', ') : 'None'}</div>
             </div>
         </div>
     `;
@@ -586,9 +621,11 @@ function loadPurchases() {
     const container = document.getElementById('purchasesList');
     container.innerHTML = '<div class="loading">Loading purchase history...</div>';
     
-    api.getCustomerHistory(state.currentUser.id || state.currentUser.CUSTOMER_ID)
+    const customerId = state.currentUser.id || state.currentUser.CUSTOMER_ID || state.currentUser.customer_id;
+    
+    api.getCustomerHistory(customerId)
         .then(sales => {
-            if (sales.length === 0) {
+            if (!sales || sales.length === 0) {
                 container.innerHTML = '<div class="alert alert-info">No purchases found.</div>';
                 return;
             }
@@ -608,27 +645,42 @@ function loadPurchases() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${sales.map(sale => `
-                            <tr>
-                                <td>${sale.SALE_ID || sale.sale_id}</td>
-                                <td>${new Date(sale.SALE_DATE || sale.sale_date).toLocaleDateString()}</td>
-                                <td>$${(sale.SALE_PRICE || sale.sale_price).toLocaleString()}</td>
-                                <td>${sale.VIN || sale.vin}</td>
-                                <td>${sale.MODEL_YEAR || sale.model_year}</td>
-                                <td>${(sale.MILEAGE || sale.mileage).toLocaleString()} mi</td>
-                                <td>
-                                    <button class="btn btn-primary" onclick="router.navigate('sale-detail'); loadSaleDetail(${sale.SALE_ID || sale.sale_id})">
-                                        View Details
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
+                        ${sales.map(sale => {
+                            const saleId = sale.SALE_ID || sale.sale_id;
+                            const saleDate = sale.SALE_DATE || sale.sale_date;
+                            const salePrice = sale.SALE_PRICE || sale.sale_price || 0;
+                            const vin = sale.VIN || sale.vin;
+                            const modelYear = sale.MODEL_YEAR || sale.model_year;
+                            const mileage = sale.MILEAGE || sale.mileage || 0;
+                            const dateStr = saleDate ? (typeof saleDate === 'string' ? new Date(saleDate).toLocaleDateString() : new Date(saleDate).toLocaleDateString()) : 'N/A';
+                            
+                            return `
+                                <tr>
+                                    <td>${saleId}</td>
+                                    <td>${dateStr}</td>
+                                    <td>$${salePrice.toLocaleString()}</td>
+                                    <td>${vin}</td>
+                                    <td>${modelYear}</td>
+                                    <td>${mileage.toLocaleString()} mi</td>
+                                    <td>
+                                        <button class="btn btn-primary" onclick="router.navigate('sale-detail'); loadSaleDetail(${saleId})">
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
                     </tbody>
                 </table>
             `;
         })
         .catch(err => {
-            container.innerHTML = `<div class="alert alert-error">Error loading purchases: ${err.message}</div>`;
+            console.error('Error loading purchases:', err);
+            if (err.message === 'BACKEND_NOT_AVAILABLE') {
+                container.innerHTML = '<div class="alert alert-info">Backend not available. Purchase history will be available when connected to backend.</div>';
+            } else {
+                container.innerHTML = `<div class="alert alert-error">Error loading purchases: ${err.message}</div>`;
+            }
         });
 }
 
