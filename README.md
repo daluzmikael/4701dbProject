@@ -110,13 +110,3 @@ See `BACKEND_API_REQUIREMENTS.md` for a complete list of API endpoints that need
 
 **Note:** The frontend currently uses mock data for some features. Once the backend endpoints are implemented, update the `API_BASE` constant in `frontend/app.js` to point to your backend URL.
 
-## Notes
-
-- Make sure you have Oracle Database running and accessible with the credentials configured in `backend/app.py`
-- The frontend expects the backend to be running on `http://localhost:5000` (update `API_BASE` in `frontend/app.js` if different)
-- If you encounter database connection errors, ensure:
-  - Oracle Database is running
-  - The connection settings in `backend/app.py` are correct
-  - The database service name matches your Oracle installation
-- The frontend is a client-side SPA - no backend is needed to view the UI structure, but API calls will fail until backend endpoints are implemented
-
